@@ -1,0 +1,13 @@
+
+
+spring:
+  datasource:
+    url: ${TEST_DB_URL:jdbc:mysql://localhost:3309/crm_test?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC}
+    username: ${TEST_DB_USERNAME:adham}
+    password: ${TEST_DB_PASSWORD:adham123}
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+

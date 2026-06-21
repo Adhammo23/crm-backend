@@ -1,0 +1,18 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: crm-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: crm_dev
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_USER: adham
+      MYSQL_PASSWORD: adham123
+    ports:
+      - "3309:3306"
+    volumes:
+      - crm_mysql_data:/var/lib/mysql
+volumes:
+  crm_mysql_data:
+
+
