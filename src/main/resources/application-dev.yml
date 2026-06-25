@@ -12,6 +12,10 @@ spring:
       hibernate:
         format_sql: true
 
+  jwt:
+    secretKey: crm-dev-secret-key-change-in-production
+    access-token-ttl-minutes: 15
+
 logging:
   level:
     org.hibernate.SQL: DEBUG
