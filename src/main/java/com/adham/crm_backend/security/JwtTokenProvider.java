@@ -22,7 +22,7 @@ public class JwtTokenProvider {
     private String secretKey;
 
     @Value("${jwt.access-token-ttl-minutes}")
-    private long expiration;
+    private long accessTokenTtlMinutes;
 
     public String generateAccessToken(User user){
 
@@ -33,7 +33,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .setSubject(user.getEmail())
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis()+Duration.ofMinutes(expiration).toMillis()))
+                .setExpiration(new Date(System.currentTimeMillis()+Duration.ofMinutes(accessTokenTtlMinutes).toMillis()))
                 .claim("roles",roles)
                 .signWith(getSignKey())
                 .compact();
