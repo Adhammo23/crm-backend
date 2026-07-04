@@ -18,10 +18,10 @@ public class CreateUserRequest {
     private String fullName;
 
     @Email
-    @NotBlank
+    @NotBlank(message = "email is required")
     private String email;
 
-    @NotBlank
+    @NotBlank(message = "email is required")
     @Size(min = 8)
     @Pattern(regexp = "(?=.*[A-Za-z])(?=.*\\d).+$",
             message = " requiring at least one letter and one digit")
