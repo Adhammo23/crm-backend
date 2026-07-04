@@ -2,6 +2,7 @@ package com.adham.crm_backend.service;
 import com.adham.crm_backend.dto.RefreshTokenResult;
 import com.adham.crm_backend.entity.RefreshToken;
 import com.adham.crm_backend.entity.User;
+import com.adham.crm_backend.exception.InvalidRefreshTokenException;
 import com.adham.crm_backend.repository.RefreshTokenRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -18,7 +19,6 @@ import java.util.UUID;
 @Service
 @AllArgsConstructor
 public class RefreshTokenService {
-
 
     @Value("${jwt.refresh-token-ttl-days}")
     private long refreshTokenTtlDays;
@@ -48,8 +48,6 @@ public class RefreshTokenService {
     public RefreshToken validate(String rawToken){
 
         String hashedToken = hashToken(rawToken);
-
-
 
             RefreshToken refreshToken  = refreshTokenRepository.findByTokenHash(hashedToken)
                     .orElseThrow(() -> new InvalidRefreshTokenException("Invalid refresh token"));
