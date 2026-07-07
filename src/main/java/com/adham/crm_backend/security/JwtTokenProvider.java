@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.secret}")
+    @Value("${jwt.secretKey}")
     private String secretKey;
 
     @Value("${jwt.access-token-ttl-minutes}")
