@@ -8,7 +8,7 @@ import com.adham.crm_backend.entity.RefreshToken;
 import com.adham.crm_backend.entity.User;
 import com.adham.crm_backend.repository.UserRepository;
 import com.adham.crm_backend.security.JwtTokenProvider;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,7 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.Duration;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService {
     @Value("${jwt.access-token-ttl-minutes}")
     private Long accessTokenTtlMinutes;
