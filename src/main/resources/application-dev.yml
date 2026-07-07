@@ -12,8 +12,8 @@ spring:
       hibernate:
         format_sql: true
 
-  jwt:
-    secretKey: crm-dev-secret-key-change-in-production
+jwt:
+    secretKey: VGhpc0lzQVN1cGVyU2VjdXJlMjU2Qml0S2V5Rm9ySldURGV2RW52aXJvbm1lbnQxMjM0NTY3ODkw
     access-token-ttl-minutes: 15
     refresh-token-ttl-days: 7
 
