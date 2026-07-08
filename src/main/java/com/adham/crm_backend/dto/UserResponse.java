@@ -13,6 +13,6 @@ public class UserResponse {
     private String fullName;
     private String email;
     private Set<String> roles;
-    private Boolean isActive;
+    private Boolean active;
     private Instant createdAt;
 }

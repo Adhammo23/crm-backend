@@ -4,7 +4,7 @@ import com.adham.crm_backend.entity.RefreshToken;
 import com.adham.crm_backend.entity.User;
 import com.adham.crm_backend.exception.InvalidRefreshTokenException;
 import com.adham.crm_backend.repository.RefreshTokenRepository;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class RefreshTokenService {
 
     @Value("${jwt.refresh-token-ttl-days}")

@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
                                                                 HttpServletRequest request){
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
-                ex.getBindingResult().getFieldErrors().getFirst().getDefaultMessage(),
+                ex.getBindingResult().getFieldErrors().get(0).getDefaultMessage(),
                 request
         );
 

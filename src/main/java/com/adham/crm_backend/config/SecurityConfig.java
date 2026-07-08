@@ -1,5 +1,9 @@
 package com.adham.crm_backend.config;
+import com.adham.crm_backend.security.JwtAccessDeniedHandler;
+import com.adham.crm_backend.security.JwtAuthenticationEntryPoint;
+import com.adham.crm_backend.security.JwtAuthenticationFilter;
 import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,15 +18,19 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -31,9 +39,13 @@ public class SecurityConfig {
 
                  .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
+                 .exceptionHandling(exception -> exception.authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                         .accessDeniedHandler(jwtAccessDeniedHandler))
+
                  .authorizeHttpRequests(auth-> auth
                         .requestMatchers("/api/v1/auth/login","/api/v1/auth/refresh","/v3/api-docs/**","/swagger-ui/**","/swagger-ui.html")
-                        .permitAll().anyRequest().authenticated());
+                        .permitAll().anyRequest().authenticated())
+                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
          return http.build();
     }
     @Bean
