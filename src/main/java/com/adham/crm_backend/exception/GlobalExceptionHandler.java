@@ -38,6 +38,22 @@ public class GlobalExceptionHandler {
 
     }
 
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResource(ResourceNotFoundException ex,
+                                                        HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex,
+                                                                 HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
+    @ExceptionHandler(InvalidRoleIdException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRoleId(InvalidRoleIdException ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+
     private ResponseEntity<ErrorResponse>  buildErrorResponse(
             HttpStatus status,
             String message,

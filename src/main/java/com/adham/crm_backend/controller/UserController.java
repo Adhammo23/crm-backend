@@ -1,12 +1,14 @@
 package com.adham.crm_backend.controller;
 
+import com.adham.crm_backend.dto.CreateUserRequest;
 import com.adham.crm_backend.dto.UserResponse;
 import com.adham.crm_backend.service.UserService;
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/users")
@@ -18,5 +20,10 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getCurrentUser(){
         return ResponseEntity.ok(userService.getCurrentUser());
+    }
+    @PostMapping()
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<UserResponse> createUser (@RequestBody @Valid CreateUserRequest request){
+        return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 }
