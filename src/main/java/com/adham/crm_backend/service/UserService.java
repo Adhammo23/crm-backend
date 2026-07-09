@@ -11,6 +11,8 @@ import com.adham.crm_backend.repository.RoleRepository;
 import com.adham.crm_backend.repository.UserRepository;
 import com.adham.crm_backend.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -62,5 +64,10 @@ public class UserService {
 
         return userMapper.toResponse(savedUser);
     }
+
+    public Page<UserResponse> getAllUsers(Pageable pageable){
+        return userRepository.findAll(pageable).map(userMapper::toResponse);
+    }
+
 
 }

@@ -5,6 +5,9 @@ import com.adham.crm_backend.dto.UserResponse;
 import com.adham.crm_backend.service.UserService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +24,13 @@ public class UserController {
     public ResponseEntity<UserResponse> getCurrentUser(){
         return ResponseEntity.ok(userService.getCurrentUser());
     }
-    @PostMapping()
+    @GetMapping
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<Page<UserResponse>> getAllUsers(
+            @PageableDefault(size = 10, sort = "createdAt") Pageable pageable){
+        return ResponseEntity.ok(userService.getAllUsers(pageable));
+    }
+    @PostMapping
     @PreAuthorize("hasAuthority('ROLE_ADMIN')")
     public ResponseEntity<UserResponse> createUser (@RequestBody @Valid CreateUserRequest request){
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
