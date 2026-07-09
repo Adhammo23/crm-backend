@@ -3,8 +3,10 @@ package com.adham.crm_backend.service;
 import com.adham.crm_backend.dto.CreateUserRequest;
 import com.adham.crm_backend.dto.UserResponse;
 import com.adham.crm_backend.entity.Role;
+import com.adham.crm_backend.entity.RoleName;
 import com.adham.crm_backend.entity.User;
 import com.adham.crm_backend.exception.InvalidRoleIdException;
+import com.adham.crm_backend.exception.ResourceNotFoundException;
 import com.adham.crm_backend.exception.UserAlreadyExistsException;
 import com.adham.crm_backend.mapper.UserMapper;
 import com.adham.crm_backend.repository.RoleRepository;
@@ -13,6 +15,8 @@ import com.adham.crm_backend.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -69,5 +73,21 @@ public class UserService {
         return userRepository.findAll(pageable).map(userMapper::toResponse);
     }
 
+    public UserResponse getUserById(Long id){
+
+        UserDetails currentUser = SecurityUtils.getCurrentUser();
+        User targetUser = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with id: " + id));
+
+        boolean isAdmin = currentUser.getAuthorities().stream()
+                .anyMatch(authority ->
+                        authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if (!isAdmin && !currentUser.getUsername().equals(targetUser.getEmail())) {
+            throw new AccessDeniedException("You are not allowed to access this user.");
+        }
+        return userMapper.toResponse(targetUser);
+    }
 
 }
