@@ -3,6 +3,7 @@ package com.adham.crm_backend.exception;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -52,6 +53,10 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidRoleIdException.class)
     public ResponseEntity<ErrorResponse> handleInvalidRoleId(InvalidRoleIdException ex, HttpServletRequest request){
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex,HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request);
     }
 
     private ResponseEntity<ErrorResponse>  buildErrorResponse(
