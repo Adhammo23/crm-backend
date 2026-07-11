@@ -1,6 +1,7 @@
 package com.adham.crm_backend.controller;
 
 import com.adham.crm_backend.dto.CreateUserRequest;
+import com.adham.crm_backend.dto.UpdateUserRequest;
 import com.adham.crm_backend.dto.UserResponse;
 import com.adham.crm_backend.service.UserService;
 import jakarta.validation.Valid;
@@ -38,5 +39,10 @@ public class UserController {
     @GetMapping("/{id}")
     public ResponseEntity<UserResponse> getUserById(@PathVariable Long id){
         return ResponseEntity.ok(userService.getUserById(id));
+    }
+    @PutMapping("/{id}")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request){
+        return ResponseEntity.ok(userService.updateUser(id,request));
     }
 }

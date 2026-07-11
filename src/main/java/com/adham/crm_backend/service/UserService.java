@@ -1,9 +1,9 @@
 package com.adham.crm_backend.service;
 
 import com.adham.crm_backend.dto.CreateUserRequest;
+import com.adham.crm_backend.dto.UpdateUserRequest;
 import com.adham.crm_backend.dto.UserResponse;
 import com.adham.crm_backend.entity.Role;
-import com.adham.crm_backend.entity.RoleName;
 import com.adham.crm_backend.entity.User;
 import com.adham.crm_backend.exception.InvalidRoleIdException;
 import com.adham.crm_backend.exception.ResourceNotFoundException;
@@ -16,7 +16,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.access.AuthorizationServiceException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -88,6 +87,32 @@ public class UserService {
             throw new AccessDeniedException("You are not allowed to access this user.");
         }
         return userMapper.toResponse(targetUser);
+    }
+
+
+    @Transactional
+    public UserResponse updateUser(Long id, UpdateUserRequest request){
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new ResourceNotFoundException("User not found with Id: "+id));
+
+        user.setFullName(request.fullName());
+
+        if (!user.getEmail().equals(request.email())){
+            if (userRepository.existsByEmail(request.email())){
+                throw new
+                        UserAlreadyExistsException("Email already exist with email:"+request.email());
+            }
+            user.setEmail(request.email());
+        }
+
+        List<Role> roles = roleRepository.findAllById(request.roleIds());
+        if (request.roleIds().size() != roles.size()){
+            throw new InvalidRoleIdException("One or more provided role IDs do not exist.");
+        }
+        user.setRoles(new HashSet<>(roles));
+
+        return userMapper.toResponse(user);
     }
 
 }
