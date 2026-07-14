@@ -5,9 +5,7 @@ import com.adham.crm_backend.dto.UpdateUserRequest;
 import com.adham.crm_backend.dto.UserResponse;
 import com.adham.crm_backend.entity.Role;
 import com.adham.crm_backend.entity.User;
-import com.adham.crm_backend.exception.InvalidRoleIdException;
-import com.adham.crm_backend.exception.ResourceNotFoundException;
-import com.adham.crm_backend.exception.UserAlreadyExistsException;
+import com.adham.crm_backend.exception.*;
 import com.adham.crm_backend.mapper.UserMapper;
 import com.adham.crm_backend.repository.RoleRepository;
 import com.adham.crm_backend.repository.UserRepository;
@@ -110,6 +108,7 @@ public class UserService {
 
         return userMapper.toResponse(user);
     }
+
     @Transactional
     public UserResponse activateUser(Long id) {
 
@@ -120,6 +119,15 @@ public class UserService {
         return userMapper.toResponse(user);
     }
 
+    @Transactional
+    public UserResponse deactivateUser(Long id) {
+
+        User user = findUserById(id);
+
+        changeUserActiveStatus(user, false);
+
+        return userMapper.toResponse(user);
+    }
     private User findUserById(Long id){
         return userRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("User not found with Id: "+id));

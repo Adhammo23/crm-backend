@@ -50,4 +50,10 @@ public class UserController {
     public ResponseEntity<UserResponse> activateUser(@PathVariable Long id){
         return ResponseEntity.ok(userService.activateUser(id));
     }
+    @PatchMapping("/{id}/deactivate")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<UserResponse> deactivateUser(@PathVariable Long id){
+        return ResponseEntity.ok(userService.deactivateUser(id));
+    }
+
 }

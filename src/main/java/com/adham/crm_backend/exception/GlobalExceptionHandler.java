@@ -63,6 +63,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleUserAlreadyActive(UserAlreadyActiveException ex, HttpServletRequest request){
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
+    @ExceptionHandler(
+            UserAlreadyInactiveException.class)
+    public ResponseEntity<ErrorResponse> handleUserInAlreadyActive(UserAlreadyActiveException ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
 
     private ResponseEntity<ErrorResponse>  buildErrorResponse(
             HttpStatus status,
