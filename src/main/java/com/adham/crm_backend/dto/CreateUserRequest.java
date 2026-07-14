@@ -1,8 +1,5 @@
 package com.adham.crm_backend.dto;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.util.Set;
@@ -21,11 +18,12 @@ public class CreateUserRequest {
     @NotBlank(message = "email is required")
     private String email;
 
-    @NotBlank(message = "email is required")
+    @NotBlank(message = "password is required")
     @Size(min = 8)
     @Pattern(regexp = "(?=.*[A-Za-z])(?=.*\\d).+$",
             message = " requiring at least one letter and one digit")
     private String password;
 
+    @NotEmpty(message = "At least one role is required.")
     private Set<Long> roleIds;
 }
