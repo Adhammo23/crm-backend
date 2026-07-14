@@ -75,9 +75,8 @@ public class UserService {
     public UserResponse getUserById(Long id){
 
         UserDetails currentUser = SecurityUtils.getCurrentUser();
-        User targetUser = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with id: " + id));
+
+       User targetUser = findUserById(id);
 
         boolean isAdmin = currentUser.getAuthorities().stream()
                 .anyMatch(authority ->
@@ -92,10 +91,7 @@ public class UserService {
 
     @Transactional
     public UserResponse updateUser(Long id, UpdateUserRequest request){
-        User user = userRepository.findById(id)
-                .orElseThrow(() ->
-                        new ResourceNotFoundException("User not found with Id: "+id));
-
+        User user = findUserById(id);
         user.setFullName(request.fullName());
 
         if (!user.getEmail().equals(request.email())){
@@ -113,6 +109,10 @@ public class UserService {
         user.setRoles(new HashSet<>(roles));
 
         return userMapper.toResponse(user);
+    }
+    private User findUserById(Long id){
+        return userRepository.findById(id).orElseThrow(() ->
+                new ResourceNotFoundException("User not found with Id: "+id));
     }
 
 }
