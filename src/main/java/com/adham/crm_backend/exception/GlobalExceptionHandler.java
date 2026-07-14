@@ -58,6 +58,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex,HttpServletRequest request){
         return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request);
     }
+    @ExceptionHandler(
+            UserAlreadyActiveException.class)
+    public ResponseEntity<ErrorResponse> handleUserAlreadyActive(UserAlreadyActiveException ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
+    }
 
     private ResponseEntity<ErrorResponse>  buildErrorResponse(
             HttpStatus status,

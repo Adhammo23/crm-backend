@@ -45,4 +45,9 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUser(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request){
         return ResponseEntity.ok(userService.updateUser(id,request));
     }
+    @PatchMapping("/{id}/activate")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    public ResponseEntity<UserResponse> activateUser(@PathVariable Long id){
+        return ResponseEntity.ok(userService.activateUser(id));
+    }
 }

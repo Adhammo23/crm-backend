@@ -110,9 +110,32 @@ public class UserService {
 
         return userMapper.toResponse(user);
     }
+    @Transactional
+    public UserResponse activateUser(Long id) {
+
+        User user = findUserById(id);
+
+        changeUserActiveStatus(user, true);
+
+        return userMapper.toResponse(user);
+    }
+
     private User findUserById(Long id){
         return userRepository.findById(id).orElseThrow(() ->
                 new ResourceNotFoundException("User not found with Id: "+id));
     }
+    private void changeUserActiveStatus(User user, boolean status){
+        if (user.isActive() == status) {
+
+            if (status) {
+                throw new UserAlreadyActiveException("User is already active.");
+            }
+
+            throw new UserAlreadyInactiveException("User is already inactive.");
+        }
+
+        user.setActive(status);
+    }
+
 
 }
