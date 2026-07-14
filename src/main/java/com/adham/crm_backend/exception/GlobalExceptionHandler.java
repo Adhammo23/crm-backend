@@ -44,12 +44,6 @@ public class GlobalExceptionHandler {
                                                         HttpServletRequest request){
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
     }
-
-    @ExceptionHandler(UserAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyExists(UserAlreadyExistsException ex,
-                                                                 HttpServletRequest request){
-        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
-    }
     @ExceptionHandler(InvalidRoleIdException.class)
     public ResponseEntity<ErrorResponse> handleInvalidRoleId(InvalidRoleIdException ex, HttpServletRequest request){
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
@@ -59,13 +53,8 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.FORBIDDEN, ex.getMessage(), request);
     }
     @ExceptionHandler(
-            UserAlreadyActiveException.class)
-    public ResponseEntity<ErrorResponse> handleUserAlreadyActive(UserAlreadyActiveException ex, HttpServletRequest request){
-        return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
-    }
-    @ExceptionHandler(
-            UserAlreadyInactiveException.class)
-    public ResponseEntity<ErrorResponse> handleUserInAlreadyActive(UserAlreadyActiveException ex, HttpServletRequest request){
+            BusinessConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflict(BusinessConflictException ex, HttpServletRequest request){
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
 
