@@ -4,10 +4,13 @@ import com.adham.crm_backend.dto.CreateUserRequest;
 import com.adham.crm_backend.dto.UpdateUserRequest;
 import com.adham.crm_backend.dto.UserResponse;
 import com.adham.crm_backend.entity.Role;
+import com.adham.crm_backend.entity.RoleName;
+import com.adham.crm_backend.entity.Team;
 import com.adham.crm_backend.entity.User;
 import com.adham.crm_backend.exception.*;
 import com.adham.crm_backend.mapper.UserMapper;
 import com.adham.crm_backend.repository.RoleRepository;
+import com.adham.crm_backend.repository.TeamRepository;
 import com.adham.crm_backend.repository.UserRepository;
 import com.adham.crm_backend.security.SecurityUtils;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +33,7 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleRepository roleRepository;
+    private final TeamRepository teamRepository;
 
     public UserResponse getCurrentUser(){
 
@@ -54,14 +58,26 @@ public class UserService {
         if (request.getRoleIds().size() != roles.size()){
                 throw new InvalidRoleIdException("One or more provided role IDs do not exist.");
         }
-        User user = User.builder()
+        boolean isSalesEmployee = roles.stream()
+                .anyMatch(role -> role.getName() == RoleName.ROLE_SALES_EMPLOYEE);
+
+        if (request.getTeamId() != null && !isSalesEmployee) {
+            throw new BusinessConflictException("Only Sales Employees can be assigned to a team.");
+        }
+        User.UserBuilder user = User.builder()
                 .fullName(request.getFullName())
                 .email(request.getEmail())
                 .passwordHash(passwordEncoder.encode(request.getPassword()))
-                .roles(new HashSet<>(roles))
-                .build();
+                .roles(new HashSet<>(roles));
 
-        User savedUser = userRepository.save(user);
+        if (request.getTeamId() != null){
+            Team team = teamRepository.findById(request.getTeamId())
+                    .orElseThrow(() -> new ResourceNotFoundException(
+                            "Team not found with id: " + request.getTeamId()));
+            user.team(team);
+        }
+
+        User savedUser = userRepository.save(user.build());
 
         return userMapper.toResponse(savedUser);
     }

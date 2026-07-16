@@ -15,4 +15,5 @@ public class UserResponse {
     private Set<String> roles;
     private Boolean active;
     private Instant createdAt;
+    private String teamName;
 }
