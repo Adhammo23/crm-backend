@@ -1,8 +1,11 @@
 package com.adham.crm_backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
+import io.swagger.v3.oas.annotations.media.Schema;
 
-public record RefreshRequest( @NotBlank(message = "refresh token is required")
-                               String refreshToken) {
+public record RefreshRequest(
+        @Schema(description = "Refresh token", example = "eyJhbGciOiJIUzI1NiJ9...")
+        @NotBlank(message = "refresh token is required")
+        String refreshToken) {
 
 }
