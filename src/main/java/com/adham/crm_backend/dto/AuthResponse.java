@@ -1,7 +1,15 @@
 package com.adham.crm_backend.dto;
 
-public record AuthResponse( String accessToken,
-         String refreshToken,
-         Long expiresIn) {
+import io.swagger.v3.oas.annotations.media.Schema;
+
+public record AuthResponse(
+        @Schema(description = "JWT access token", example = "eyJhbGciOiJIUzI1NiJ9...")
+        String accessToken,
+
+        @Schema(description = "JWT refresh token", example = "eyJhbGciOiJIUzI1NiJ9...")
+        String refreshToken,
+
+        @Schema(description = "Access token expiry in seconds", example = "3600")
+        Long expiresIn) {
 
 }
