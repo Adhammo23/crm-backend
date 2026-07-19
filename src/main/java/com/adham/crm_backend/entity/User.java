@@ -53,4 +53,9 @@ public class User {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "team_id")
     private Team team;
+
+    // جوا Customer entity... لأ جوا User.java، أضف الـ method دي جوا الـ class
+    public boolean hasRole(RoleName roleName) {
+        return roles.stream().anyMatch(role -> role.getName() == roleName);
+    }
 }
