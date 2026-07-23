@@ -27,23 +27,37 @@ public class TeamService {
     @Transactional
     public TeamResponse createTeam(CreateTeamRequest request) {
 
-        if (teamRepository.existsByName(request.name())) {
-            throw new TeamAlreadyExistsException(
-                    "Team already exists with name: " + request.name());
-        }
-
         Team team = Team.builder()
                 .name(request.name())
                 .build();
 
+        User manager = null;
+
         if (request.managerId() != null) {
-            User manager = findUserById(request.managerId());
-            assertManagerNotAlreadyAssigned(manager);
+            manager = findUserById(request.managerId());
+
+            if (!manager.hasRole(RoleName.ROLE_MANAGER)) {
+                throw new InvalidTeamManagerException(
+                        "User must have ROLE_MANAGER."
+                );
+            }
+
+            if (manager.getTeam() != null) {
+                throw new ManagerAlreadyAssignedException(
+                        "User is already assigned to a team."
+                );
+            }
+
             team.setManager(manager);
         }
 
-        Team savedTeam = teamRepository.save(team);
-        return teamMapper.toResponse(savedTeam);
+        teamRepository.save(team);
+
+        if (manager != null) {
+            manager.setTeam(team);
+        }
+
+        return teamMapper.toResponse(team);
     }
 
     public TeamResponse getTeamById(Long id) {
