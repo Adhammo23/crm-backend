@@ -100,11 +100,4 @@ public class TeamService {
                 .orElseThrow(() -> new ResourceNotFoundException(
                         "User not found with id: " + id));
     }
-
-    private void assertManagerNotAlreadyAssigned(User manager) {
-        if (teamRepository.findByManager(manager).isPresent()) {
-            throw new ManagerAlreadyAssignedException(
-                    "User with id " + manager.getId() + " already manages a team.");
-        }
-    }
 }
