@@ -57,7 +57,21 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleConflict(BusinessConflictException ex, HttpServletRequest request){
         return buildErrorResponse(HttpStatus.CONFLICT, ex.getMessage(), request);
     }
-
+    @ExceptionHandler(MissingOwnerException.class)
+    public ResponseEntity<ErrorResponse> handleMissingOwner(MissingOwnerException ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
+    }
+    @ExceptionHandler(InvalidTeamManagerException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTeamManager(InvalidTeamManagerException ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.BAD_REQUEST,ex.getMessage(),request);
+    }
+    @ExceptionHandler(InvalidTeamMemberException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTeamManager(InvalidTeamMemberException ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.BAD_REQUEST,ex.getMessage(),request);}
+    @ExceptionHandler(InvalidCustomerOwnerException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidCustomerOwner(InvalidCustomerOwnerException ex, HttpServletRequest request){
+        return buildErrorResponse(HttpStatus.BAD_REQUEST,ex.getMessage(),request);
+    }
     private ResponseEntity<ErrorResponse>  buildErrorResponse(
             HttpStatus status,
             String message,

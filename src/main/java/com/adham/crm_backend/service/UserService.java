@@ -1,5 +1,6 @@
 package com.adham.crm_backend.service;
 
+import com.adham.crm_backend.dto.AssignTeamRequest;
 import com.adham.crm_backend.dto.CreateUserRequest;
 import com.adham.crm_backend.dto.UpdateUserRequest;
 import com.adham.crm_backend.dto.UserResponse;
@@ -142,6 +143,21 @@ public class UserService {
 
         changeUserActiveStatus(user, false);
 
+        return userMapper.toResponse(user);
+    }
+    @Transactional
+    public UserResponse assignTeam(Long userId , AssignTeamRequest request){
+
+        User user = findUserById(userId);
+        Team team = teamRepository.findById(request.teamId()).orElseThrow(() ->
+                new ResourceNotFoundException("team not found with id: "+request.teamId()));
+
+        if (!user.hasRole(RoleName.ROLE_SALES_EMPLOYEE)){
+            throw new InvalidTeamMemberException(
+                    "Only sales employees can be assigned to a team."
+            );
+        }
+        user.setTeam(team);
         return userMapper.toResponse(user);
     }
     private User findUserById(Long id){
