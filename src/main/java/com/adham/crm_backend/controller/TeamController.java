@@ -2,6 +2,8 @@ package com.adham.crm_backend.controller;
 
 import com.adham.crm_backend.documentation.annotation.CreateApiResponses;
 import com.adham.crm_backend.documentation.annotation.GetApiResponses;
+import com.adham.crm_backend.documentation.annotation.UpdateApiResponses;
+import com.adham.crm_backend.dto.AssignManagerRequest;
 import com.adham.crm_backend.dto.CreateTeamRequest;
 import com.adham.crm_backend.dto.TeamResponse;
 import com.adham.crm_backend.service.TeamService;
@@ -57,5 +59,14 @@ public class TeamController {
     @GetApiResponses
     public ResponseEntity<TeamResponse> getTeamByManagerId(@PathVariable Long managerId) {
         return ResponseEntity.ok(teamService.getTeamByManagerId(managerId));
+    }
+
+    @PatchMapping("/{teamId}/manager")
+    @PreAuthorize("hasAuthority('ROLE_ADMIN')")
+    @Operation(summary = "Assign manager to team")
+    @UpdateApiResponses
+    public ResponseEntity<TeamResponse> assignManager(@PathVariable Long teamId, @Valid @RequestBody AssignManagerRequest request){
+        return ResponseEntity.ok(teamService.assignManager(teamId,request));
+
     }
 }

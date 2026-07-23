@@ -1,12 +1,12 @@
 package com.adham.crm_backend.service;
 
+import com.adham.crm_backend.dto.AssignManagerRequest;
 import com.adham.crm_backend.dto.CreateTeamRequest;
 import com.adham.crm_backend.dto.TeamResponse;
+import com.adham.crm_backend.entity.RoleName;
 import com.adham.crm_backend.entity.Team;
 import com.adham.crm_backend.entity.User;
-import com.adham.crm_backend.exception.ManagerAlreadyAssignedException;
-import com.adham.crm_backend.exception.ResourceNotFoundException;
-import com.adham.crm_backend.exception.TeamAlreadyExistsException;
+import com.adham.crm_backend.exception.*;
 import com.adham.crm_backend.mapper.TeamMapper;
 import com.adham.crm_backend.repository.TeamRepository;
 import com.adham.crm_backend.repository.UserRepository;
@@ -62,6 +62,31 @@ public class TeamService {
 
     public Page<TeamResponse> getAllTeams(Pageable pageable) {
         return teamRepository.findAll(pageable).map(teamMapper::toResponse);
+    }
+    @Transactional
+    public TeamResponse assignManager(Long teamId, AssignManagerRequest request) {
+
+        Team team = findTeamById(teamId);
+
+        if (team.getManager() != null){
+            throw new BusinessConflictException("team already have manager");
+        }
+
+        User manager = findUserById(request.managerId());
+
+        if (!manager.hasRole(RoleName.ROLE_MANAGER)) {
+            throw new InvalidTeamManagerException(
+                    "User must have ROLE_MANAGER."
+            );
+        }
+        if (manager.getTeam() !=null){
+            throw new ManagerAlreadyAssignedException("User with id" + manager.getId() + " already manages a team.");
+        }
+
+        team.setManager(manager);
+        manager.setTeam(team);
+
+        return teamMapper.toResponse(team);
     }
 
     private Team findTeamById(Long id) {
