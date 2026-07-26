@@ -3,6 +3,7 @@ package com.adham.crm_backend.controller;
 import com.adham.crm_backend.documentation.annotation.CreateApiResponses;
 import com.adham.crm_backend.documentation.annotation.GetApiResponses;
 import com.adham.crm_backend.documentation.annotation.UpdateApiResponses;
+import com.adham.crm_backend.dto.AssignTeamRequest;
 import com.adham.crm_backend.dto.CreateUserRequest;
 import com.adham.crm_backend.dto.UpdateUserRequest;
 import com.adham.crm_backend.dto.UserResponse;
@@ -98,8 +99,17 @@ public class UserController {
                     content = @Content(mediaType = "application/json",
                             schema = @Schema(implementation = ErrorResponse.class)))
     })
-    public ResponseEntity<UserResponse> deactivateUser(@PathVariable Long id){
+    public ResponseEntity<UserResponse> deactivateUser(@PathVariable Long id) {
         return ResponseEntity.ok(userService.deactivateUser(id));
     }
+
+    @PatchMapping("/{userId}/assign-team")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN','ROLE_MANAGER')")
+    @Operation(summary = "Assign team" , description = "Add user to the team")
+    @UpdateApiResponses
+    public ResponseEntity<UserResponse> assignTeam(@PathVariable Long userId,@Valid @RequestBody AssignTeamRequest request){
+        return ResponseEntity.ok(userService.assignTeam(userId,request));
+
+}
 
 }
