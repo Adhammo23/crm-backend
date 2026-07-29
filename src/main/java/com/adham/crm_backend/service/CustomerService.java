@@ -13,6 +13,9 @@ import com.adham.crm_backend.mapper.CustomerMapper;
 import com.adham.crm_backend.repository.CustomerRepository;
 import com.adham.crm_backend.repository.UserRepository;
 import com.adham.crm_backend.security.SecurityUtils;
+import com.adham.crm_backend.specification.CustomerAccessSpecifications;
+import com.adham.crm_backend.specification.CustomerSearchRequest;
+import com.adham.crm_backend.specification.CustomerSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +29,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
     private final CustomerMapper customerMapper;
+    private final CustomerAccessSpecifications customerAccessSpecification;
 
     @Transactional
     public CustomerResponse createCustomer(CreateCustomerRequest request) {
@@ -128,6 +132,14 @@ public class CustomerService {
 
         customer.setOwner(newOwner);
         return customerMapper.toResponse(customer);
+    }
+    public Page<CustomerResponse> search( CustomerSearchRequest request, Pageable pageable){
+
+        return customerRepository.
+                findAll(customerAccessSpecification.forCurrentUser()
+                        .and(CustomerSpecifications.search(request))
+                        ,pageable)
+                .map(customerMapper::toResponse);
     }
     // =======Helper methods=======
     private void assertCanView(Customer customer){
