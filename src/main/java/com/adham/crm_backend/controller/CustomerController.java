@@ -8,6 +8,7 @@ import com.adham.crm_backend.dto.CustomerResponse;
 import com.adham.crm_backend.dto.ReassignCustomerRequest;
 import com.adham.crm_backend.dto.UpdateCustomerRequest;
 import com.adham.crm_backend.service.CustomerService;
+import com.adham.crm_backend.specification.CustomerSearchRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -62,6 +63,18 @@ public class CustomerController {
     @Operation(summary = "Reassign customer")
     public ResponseEntity<CustomerResponse> reassignCustomer(@Valid @RequestBody ReassignCustomerRequest request,@PathVariable Long id){
         return ResponseEntity.ok(customerService.reassignCustomer(request,id));
+    }
+
+    @GetMapping("/search")
+    @Operation(summary = "Search customers",
+            description = "Search customers using dynamic filters such as" +
+                    " full name, email, job title, company name, and owner ID. " +
+                    "Results are restricted based on the authenticated user's role and data access scope."
+    )
+    @GetApiResponses
+    @PreAuthorize("hasAnyAuthority('ROLE_MANAGER', 'ROLE_SALES_EMPLOYEE', 'ROLE_ADMIN')")
+    public ResponseEntity<Page<CustomerResponse>> search(@ModelAttribute CustomerSearchRequest request, Pageable pageable){
+        return ResponseEntity.ok(customerService.search(request,pageable));
     }
 
 
