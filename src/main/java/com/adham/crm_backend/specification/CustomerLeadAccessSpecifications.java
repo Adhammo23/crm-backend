@@ -13,10 +13,10 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class CustomerAccessSpecifications {
+public class CustomerLeadAccessSpecifications {
 
     private final UserRepository userRepository;
-    public Specification<Customer> forCurrentUser(){
+    public <T> Specification<T  > forCurrentUser(){
 
         User currentUser = getCurrentDomainUser();
         if (currentUser.hasRole(RoleName.ROLE_ADMIN)){
@@ -30,15 +30,15 @@ public class CustomerAccessSpecifications {
         return ownedBy(currentUser);
     }
 
-    public static Specification<Customer> ownedBy(User user){
+    public static <T> Specification<T> ownedBy(User user){
         return (root, query, criteriaBuilder) ->
             criteriaBuilder.equal(root.get("owner").get("id"),user.getId());
     }
 
-    public static Specification<Customer> ownedByManagerOrTeam(User manager) {
+    public static <T> Specification<T> ownedByManagerOrTeam(User manager) {
 
         return (root, query, criteriaBuilder) -> {
-            Join<Customer, User> owner =
+            Join<T, User> owner =
                     root.join("owner", JoinType.LEFT);
 
             Join<User, Team> team = owner.join("team",JoinType.LEFT);
