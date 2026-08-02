@@ -158,9 +158,20 @@ public class LeadService {
 
         customer.owner(owner);
         Customer savedCustomer = customerRepository.save(customer.build());
-        lead.setStatus(LeadStatus.CONVERTED);
 
-        lead.setConvertedCustomerId(savedCustomer.getId());
+
+        // Atomically update the lead status to CONVERTED only if it is still QUALIFIED.
+        // This prevents race conditions (two users converting the same lead simultaneously).
+        // Returns 1 if updated successfully, 0 if the status changed concurrently.
+        int updatedRows = leadRepository.updateStatusIfMatches(
+                id,
+                LeadStatus.QUALIFIED,
+                LeadStatus.CONVERTED,
+                savedCustomer.getId()
+        );
+        if (updatedRows == 0) {
+            throw new InvalidLeadStatusException("This lead has already been converted by another user.");
+        }
 
         return customerMapper.toResponse(savedCustomer);
     }
