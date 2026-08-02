@@ -16,6 +16,7 @@ import com.adham.crm_backend.security.SecurityUtils;
 import com.adham.crm_backend.specification.CustomerAccessSpecifications;
 import com.adham.crm_backend.specification.CustomerSearchRequest;
 import com.adham.crm_backend.specification.CustomerSpecifications;
+import com.adham.crm_backend.common.security.AssertControl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ public class CustomerService {
     private final UserRepository userRepository;
     private final CustomerMapper customerMapper;
     private final CustomerAccessSpecifications customerAccessSpecification;
+    private final AssertControl assertControl;
     private final OwnerResolver ownerResolver;
 
     @Transactional
@@ -73,7 +75,7 @@ public class CustomerService {
     }
     public CustomerResponse getCustomerById(Long id){
         Customer customer = findCustomerById(id);
-        assertCanView(customer);
+        assertControl.assertCanAccess(customer);
         return customerMapper.toResponse(customer);
     }
 
@@ -82,7 +84,7 @@ public class CustomerService {
 
         Customer customer = findCustomerById(id);
 
-        assertCanView(customer);
+        assertControl.assertCanAccess(customer);
 
         if (request.fullName() != null){
             customer.setFullName(request.fullName());
@@ -111,10 +113,11 @@ public class CustomerService {
     @Transactional
     public CustomerResponse reassignCustomer(ReassignCustomerRequest request, Long id){
         Customer customer = findCustomerById(id);
-        assertCanReassign(customer);
+
+        assertControl.assertCanReassign(customer);
 
         User newOwner = findUserById(request.ownerId());
-        assertValidOwner(newOwner);
+        assertControl.assertValidOwner(newOwner);
         if (!(newOwner.getTeam().getId()
                 .equals(customer.getOwner().getTeam().getId()))){
             throw new CustomerReassignmentException("the New owner should be in same team as the old owner");
@@ -132,53 +135,6 @@ public class CustomerService {
                 .map(customerMapper::toResponse);
     }
     // =======Helper methods=======
-    private void assertCanView(Customer customer){
-        User currentUser = getCurrentDomainUser();
-
-        if (currentUser.hasRole(RoleName.ROLE_ADMIN)) return;
-        if (currentUser.hasRole(RoleName.ROLE_MANAGER)){
-            boolean isOwnCustomer = customer.getOwner().getId().equals(currentUser.getId());
-            boolean isTeamCustomer = customer.getOwner().getTeam() != null
-                    && customer.getOwner().getTeam().getManager() !=null
-                    && customer.getOwner().getTeam().getManager().getId().equals(currentUser.getId());
-            if (isOwnCustomer || isTeamCustomer ) return;
-            throw new AccessDeniedException("You do not have access to this customer.");
-        }
-
-        // Sales Employee
-        if (!customer.getOwner().getId().equals(currentUser.getId())){
-            throw new AccessDeniedException("You do not have access to this customer.");
-        }
-    }
-
-    private void assertCanReassign (Customer customer){
-        User currentUser = getCurrentDomainUser();
-
-        if (currentUser.hasRole(RoleName.ROLE_ADMIN)) return;
-
-        if (currentUser.hasRole(RoleName.ROLE_MANAGER)){
-            boolean isTeamCustomer = customer.getOwner().getTeam() != null
-                    && customer.getOwner().getTeam().getManager() !=null
-                    && customer.getOwner().getTeam().getManager().getId().equals(currentUser.getId());
-            if (isTeamCustomer ){ return;}
-
-            throw new AccessDeniedException("You do not have access to this customer.");
-        }
-        throw new AccessDeniedException(
-                "You do not have permission to reassign customers.");
-
-    }
-    private void assertValidOwner(User newOwner) {
-
-        if (!newOwner.hasRole(RoleName.ROLE_SALES_EMPLOYEE)) {
-            throw new MissingOwnerException(
-                    "Customer owner must be a sales employee."
-            );
-        }
-        if (newOwner.getTeam() == null){
-            throw new InvalidCustomerOwnerException("Customer owner must be assigned to a team");
-        }
-    }
     private Customer findCustomerById(Long id){
         return customerRepository.findById(id)
                 .orElseThrow(() ->
@@ -187,7 +143,6 @@ public class CustomerService {
     private User findUserById(Long id){
         return userRepository.findById(id).orElseThrow( () -> new ResourceNotFoundException("User not found"));
     }
-
     private User getCurrentDomainUser() {
         String email = SecurityUtils.getCurrentUser().getUsername();
         return userRepository.findByEmailWithRoles(email).orElseThrow(() -> new IllegalStateException("Authenticated user not found in database: " + email));

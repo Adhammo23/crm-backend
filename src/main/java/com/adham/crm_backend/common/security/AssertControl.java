@@ -42,6 +42,19 @@ public class AssertControl {
                     "You do not have permission to reassign customers.");
         }
 
+    public void assertCanReassign(HasOwner entity){
+        User currentUser = currentUserService.getCurrentUser();
+        if (currentUser.hasRole(RoleName.ROLE_ADMIN)) return;
+        if (currentUser.hasRole(RoleName.ROLE_MANAGER)){
+            boolean isTeamRecord = entity.getOwner().getTeam() != null
+                    && entity.getOwner().getTeam().getManager() != null
+                    && entity.getOwner().getTeam().getManager().getId().equals(currentUser.getId());
+            if (isTeamRecord) return;
+            throw new AccessDeniedException("You do not have access");
+        }
+        throw new AccessDeniedException("You do not have permission to reassign customers.");
+    }
+
     public void assertValidOwner(User owner) {
 
         if (!owner.hasRole(RoleName.ROLE_SALES_EMPLOYEE)) {

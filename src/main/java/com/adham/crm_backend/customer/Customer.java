@@ -1,5 +1,7 @@
-package com.adham.crm_backend.entity;
+package com.adham.crm_backend.customer;
 
+import com.adham.crm_backend.common.security.HasOwner;
+import com.adham.crm_backend.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -14,7 +16,7 @@ import java.time.Instant;
 @AllArgsConstructor
 @Entity
 @Table(name = "customers")
-public class Customer {
+public class Customer implements HasOwner {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
