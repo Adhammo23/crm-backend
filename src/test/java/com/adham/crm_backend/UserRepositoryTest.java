@@ -1,10 +1,10 @@
 package com.adham.crm_backend;
 
-import com.adham.crm_backend.entity.Role;
-import com.adham.crm_backend.entity.RoleName;
-import com.adham.crm_backend.entity.User;
-import com.adham.crm_backend.repository.RoleRepository;
-import com.adham.crm_backend.repository.UserRepository;
+import com.adham.crm_backend.user.entity.Role;
+import com.adham.crm_backend.user.entity.RoleName;
+import com.adham.crm_backend.user.entity.User;
+import com.adham.crm_backend.user.repository.RoleRepository;
+import com.adham.crm_backend.user.repository.UserRepository;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

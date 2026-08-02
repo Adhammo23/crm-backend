@@ -1,26 +1,25 @@
-package com.adham.crm_backend.service;
+package com.adham.crm_backend.customer;
 
-import com.adham.crm_backend.dto.CreateCustomerRequest;
-import com.adham.crm_backend.dto.CustomerResponse;
-import com.adham.crm_backend.dto.ReassignCustomerRequest;
-import com.adham.crm_backend.dto.UpdateCustomerRequest;
-import com.adham.crm_backend.entity.Customer;
-import com.adham.crm_backend.entity.CustomerStatus;
-import com.adham.crm_backend.entity.RoleName;
-import com.adham.crm_backend.entity.User;
-import com.adham.crm_backend.exception.*;
-import com.adham.crm_backend.mapper.CustomerMapper;
-import com.adham.crm_backend.repository.CustomerRepository;
-import com.adham.crm_backend.repository.UserRepository;
-import com.adham.crm_backend.security.SecurityUtils;
-import com.adham.crm_backend.specification.CustomerAccessSpecifications;
-import com.adham.crm_backend.specification.CustomerSearchRequest;
-import com.adham.crm_backend.specification.CustomerSpecifications;
+import com.adham.crm_backend.common.exception.*;
+import com.adham.crm_backend.common.util.OwnerResolver;
+import com.adham.crm_backend.customer.dto.CreateCustomerRequest;
+import com.adham.crm_backend.customer.dto.CustomerResponse;
+import com.adham.crm_backend.customer.dto.ReassignCustomerRequest;
+import com.adham.crm_backend.customer.dto.UpdateCustomerRequest;
+import com.adham.crm_backend.customer.exception.CustomerAlreadyExistsException;
+import com.adham.crm_backend.customer.exception.CustomerReassignmentException;
+import com.adham.crm_backend.user.entity.RoleName;
+import com.adham.crm_backend.user.entity.User;
+import com.adham.crm_backend.user.repository.UserRepository;
 import com.adham.crm_backend.common.security.AssertControl;
+import com.adham.crm_backend.common.security.SecurityUtils;
+import com.adham.crm_backend.common.specification.CustomerLeadAccessSpecifications;
+import com.adham.crm_backend.customer.specification.CustomerSearchRequest;
+import com.adham.crm_backend.customer.specification.CustomerSpecifications;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,7 +29,7 @@ public class CustomerService {
     private final CustomerRepository customerRepository;
     private final UserRepository userRepository;
     private final CustomerMapper customerMapper;
-    private final CustomerAccessSpecifications customerAccessSpecification;
+    private final CustomerLeadAccessSpecifications customerLeadAccessSpecifications;
     private final AssertControl assertControl;
     private final OwnerResolver ownerResolver;
 
@@ -128,9 +127,13 @@ public class CustomerService {
     }
     public Page<CustomerResponse> search( CustomerSearchRequest request, Pageable pageable){
 
+        Specification<Customer> accessSpec = customerLeadAccessSpecifications.forCurrentUser();
+
+        Specification<Customer> searchSpec = CustomerSpecifications.search(request);
+
+        Specification<Customer> spec = searchSpec.and(accessSpec);
         return customerRepository.
-                findAll(customerAccessSpecification.forCurrentUser()
-                        .and(CustomerSpecifications.search(request))
+                findAll(spec
                         ,pageable)
                 .map(customerMapper::toResponse);
     }

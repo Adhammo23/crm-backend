@@ -1,11 +1,11 @@
 package com.adham.crm_backend;
 
-import com.adham.crm_backend.dto.UserResponse;
-import com.adham.crm_backend.entity.Role;
-import com.adham.crm_backend.entity.RoleName;
-import com.adham.crm_backend.entity.User;
-import com.adham.crm_backend.mapper.UserMapper;
-import com.adham.crm_backend.mapper.UserMapperImpl;
+import com.adham.crm_backend.user.UserMapperImpl;
+import com.adham.crm_backend.user.dto.UserResponse;
+import com.adham.crm_backend.user.entity.Role;
+import com.adham.crm_backend.user.entity.RoleName;
+import com.adham.crm_backend.user.entity.User;
+import com.adham.crm_backend.user.UserMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 

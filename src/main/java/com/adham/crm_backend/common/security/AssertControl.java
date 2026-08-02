@@ -1,9 +1,10 @@
-package com.adham.crm_backend.security;
+package com.adham.crm_backend.common.security;
 
-import com.adham.crm_backend.entity.RoleName;
-import com.adham.crm_backend.entity.User;
-import com.adham.crm_backend.exception.InvalidCustomerOwnerException;
-import com.adham.crm_backend.exception.MissingOwnerException;
+import com.adham.crm_backend.customer.Customer;
+import com.adham.crm_backend.user.entity.RoleName;
+import com.adham.crm_backend.user.entity.User;
+import com.adham.crm_backend.common.exception.InvalidCustomerOwnerException;
+import com.adham.crm_backend.common.exception.MissingOwnerException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Component;
