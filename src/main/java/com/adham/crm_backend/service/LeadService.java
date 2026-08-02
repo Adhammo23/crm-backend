@@ -35,23 +35,14 @@ public class LeadService {
     private final LeadStatus leadStatus;
     private final CustomerRepository customerRepository;
     private final CustomerMapper customerMapper;
+    private final OwnerResolver ownerResolver;
 
     @Transactional
     public LeadResponse createLead(CreateLeadRequest request){
         User currentUser = currentUserService.getCurrentUser();
 
-        User owner;
+        User owner = ownerResolver.resolveOwner(currentUser, request.getOwnerId());
 
-        if (currentUser.hasRole(RoleName.ROLE_SALES_EMPLOYEE)
-                && !currentUser.hasRole(RoleName.ROLE_ADMIN)
-                && !currentUser.hasRole(RoleName.ROLE_MANAGER)) {
-            owner = currentUser;
-        } else {
-            if (request.getOwnerId() == null) {
-                throw new MissingOwnerException("Owner is required when creating a lead as Manager or Admin.");
-            }
-            owner = findUserById(request.getOwnerId());
-        }
         if (leadRepository.existsByEmail(request.getEmail())) {
             throw new LeadAlreadyExistsException(
                     "Lead already exists with email: " + request.getEmail());

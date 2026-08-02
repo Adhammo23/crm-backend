@@ -30,23 +30,13 @@ public class CustomerService {
     private final UserRepository userRepository;
     private final CustomerMapper customerMapper;
     private final CustomerAccessSpecifications customerAccessSpecification;
+    private final OwnerResolver ownerResolver;
 
     @Transactional
     public CustomerResponse createCustomer(CreateCustomerRequest request) {
         User currentUser = getCurrentDomainUser();
 
-        User owner;
-
-        if (currentUser.hasRole(RoleName.ROLE_SALES_EMPLOYEE)
-                && !currentUser.hasRole(RoleName.ROLE_ADMIN)
-                && !currentUser.hasRole(RoleName.ROLE_MANAGER)) {
-            owner = currentUser;
-        } else {
-            if (request.getOwnerId() == null) {
-                throw new MissingOwnerException("Owner is required when creating a customer as Manager or Admin.");
-            }
-            owner = findUserById(request.getOwnerId());
-        }
+        User owner = ownerResolver.resolveOwner(currentUser, request.getOwnerId());
 
         if (customerRepository.existsByEmail(request.getEmail())) {
             throw new CustomerAlreadyExistsException(
