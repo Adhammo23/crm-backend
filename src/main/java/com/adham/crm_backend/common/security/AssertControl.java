@@ -39,8 +39,9 @@ public class AssertControl {
                 if (isOwnCustomer || isTeamCustomer ) return;
                 throw new AccessDeniedException("You do not have access");
             }
-            throw new AccessDeniedException(
-                    "You do not have permission to reassign customers.");
+            if (!entity.getOwner().getId().equals(currentUser.getId())){
+                throw new AccessDeniedException("You do not have access");
+            }
         }
 
     public void assertCanReassign(HasOwner entity){
