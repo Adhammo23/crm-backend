@@ -149,4 +149,18 @@ public class LeadServiceTest {
         verify(customerRepository, never()).save(any());
     }
 
+    @Test
+    void convertToCustomer_throwsWhenLeadAlreadyConvertedConcurrently() {
+        Lead lead = TestFixtures.leadOwnedBy(salesEmployee, LeadStatus.QUALIFIED);
+
+        when(leadRepository.findById(lead.getId())).thenReturn(Optional.of(lead));
+        when(customerRepository.existsByEmail(lead.getEmail())).thenReturn(false);
+        when(userRepository.findById(salesEmployee.getId())).thenReturn(Optional.of(salesEmployee));
+        when(currentUserService.getCurrentUser()).thenReturn(manager);
+        when(customerRepository.save(any(Customer.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(leadRepository.updateStatusIfMatches(any(), any(), any(), any())).thenReturn(0);
+
+        assertThrows(InvalidLeadStatusException.class,
+                () -> leadService.convertToCustomer(lead.getId(), salesEmployee.getId()));
+    }
 }
