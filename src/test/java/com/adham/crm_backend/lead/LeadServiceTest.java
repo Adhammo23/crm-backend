@@ -103,4 +103,25 @@ public class LeadServiceTest {
 
     }
 
+    @Test
+    void convertToCustomer_succeedsForQualifiedLead() {
+        Lead lead = TestFixtures.leadOwnedBy(salesEmployee, LeadStatus.QUALIFIED);
+
+        when(leadRepository.findById(lead.getId())).thenReturn(Optional.of(lead));
+        when(customerRepository.existsByEmail(lead.getEmail())).thenReturn(false);
+        when(userRepository.findById(salesEmployee.getId())).thenReturn(Optional.of(salesEmployee));
+        when(currentUserService.getCurrentUser()).thenReturn(manager);
+        when(customerRepository.save(any(Customer.class))).thenAnswer(inv -> inv.getArgument(0));
+        when(leadRepository.updateStatusIfMatches(
+                eq(lead.getId()), eq(LeadStatus.QUALIFIED), eq(LeadStatus.CONVERTED), any()))
+                .thenReturn(1);
+        when(customerMapper.toResponse(any(Customer.class))).thenReturn(mock(CustomerResponse.class));
+
+        assertDoesNotThrow(() -> leadService.convertToCustomer(lead.getId(), salesEmployee.getId()));
+
+        verify(customerRepository).save(any(Customer.class));
+        verify(leadRepository).updateStatusIfMatches(
+                eq(lead.getId()), eq(LeadStatus.QUALIFIED), eq(LeadStatus.CONVERTED), any());
+    }
+
 }
