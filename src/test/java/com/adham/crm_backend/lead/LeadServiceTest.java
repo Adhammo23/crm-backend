@@ -124,4 +124,29 @@ public class LeadServiceTest {
                 eq(lead.getId()), eq(LeadStatus.QUALIFIED), eq(LeadStatus.CONVERTED), any());
     }
 
+    @Test
+    void convertToCustomer_throwsWhenLeadNotQualified() {
+        Lead lead = TestFixtures.leadOwnedBy(salesEmployee, LeadStatus.CONTACTED); // <<<
+
+        when(leadRepository.findById(lead.getId())).thenReturn(Optional.of(lead));
+
+        assertThrows(InvalidLeadStatusException.class,
+                () -> leadService.convertToCustomer(lead.getId(), salesEmployee.getId()));
+
+        verifyNoInteractions(customerRepository);
+    }
+
+    @Test
+    void convertToCustomer_throwsWhenCustomerEmailAlreadyExists() {
+        Lead lead = TestFixtures.leadOwnedBy(salesEmployee, LeadStatus.QUALIFIED);
+
+        when(leadRepository.findById(lead.getId())).thenReturn(Optional.of(lead));
+        when(customerRepository.existsByEmail(lead.getEmail())).thenReturn(true);
+
+        assertThrows(CustomerAlreadyExistsException.class,
+                () -> leadService.convertToCustomer(lead.getId(), salesEmployee.getId()));
+
+        verify(customerRepository, never()).save(any());
+    }
+
 }
