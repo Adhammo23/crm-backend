@@ -7,12 +7,14 @@ import com.adham.crm_backend.user.repository.RoleRepository;
 import com.adham.crm_backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
+@Order(2)
 public class UserSeeder implements CommandLineRunner {
 
     private final UserRepository userRepository;
